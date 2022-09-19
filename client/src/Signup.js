@@ -32,15 +32,16 @@ const Signup = () => {
         },
     };
 
-        fetch("/api/signup", options)
+    console.log(newUser);
+
+        fetch("/api/add-user", options)
             .then((res) => res.json())
             .then((json) => {
                 const {status, error} = json;
 
                 if (status >= 400) {
-                    console.log("error is >400")
+                    console.log("400-error")
                 } else if (status === 200) {
-                    console.log("status is 200")
                     console.log("Sign Up Successful")
                 }
             })
