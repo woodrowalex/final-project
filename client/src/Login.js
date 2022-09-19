@@ -1,42 +1,46 @@
 import styled from "styled-components";
 
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PinContext } from "./PinContext";
 
 const Login = () => {
     const {
-        username,
-        setUsername,
-        email,
-        setEmail,
-        password,
-        setPassword
+        setCurrentUset,
+        isLoggedIn,
+        setIsLoggedIn
     } = useContext(PinContext);
 
     const navigate = useNavigate();
 
-    const user = {
-        username: username,
-        email: email,
-        password: password
-    };
-
+    const [usernameInput, setUsernameInput] = useState();
+    const [emailInput, setEmailInput] = useState();
+    const [passwordInput, setPasswordInput]= useState();
+    const [inputType, setInputType] = useState();
+    
     const handleSubmit = (e) => {
         e.preventDefault();
     
-        fetch("/api/login", {
+        const loggingIn = {
+            email: emailInput,
+            password: passwordInput
+        };
+
+        const options = {
             method: "POST",
-            body: JSON.stringify(user),
+            body: JSON.stringify(loggingIn),
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-        })
+        };
+
+        fetch("/api/login", options) 
             .then((res) => res.json())
             .then((data) => {
-                if (data.status === 201) {
-                    sessionStorage.setItem("user", JSON.stringify(data));
+                if (data.status === 200) {
+                    // sessionStorage.setItem("user", JSON.stringify(data));
+                    isLoggedIn = true;
                     navigate.push("/confirmed");
                 } else {
                     window.alert("Error - try again");
@@ -53,29 +57,29 @@ const Login = () => {
                     type="text"
                     name="username"
                     placeholder="Username"
+                    value={usernameInput}
                     onChange={(e) => {
-                        setUsername(e.target.value);
+                        setUsernameInput(e.target.value);
                     }}
                 />
                 <input
                     type="email"
                     name="email"
                     placeholder="Email"
+                    value={emailInput}
                     onChange={(e) => {
-                        setEmail(e.target.value);
+                        setEmailInput(e.target.value);
                     }}
                 />
                     <input
-                        type="text"
+                        type={inputType}
                         name="password"
                         placeholder="Password"
                         onChange={(e) => {
-                            setPassword(e.target.value);
+                            setPasswordInput(e.target.value);
                         }}
                     />
-                    {Object.values(user).includes(" ") 
-                        ? (<Button type="submit" disabled>Submit</Button>) 
-                        : (<Button>Submit</Button>)}
+                    <Button type="submit">Log In</Button>
                 </FormBody>
             </form>
         </FormWrapper>
