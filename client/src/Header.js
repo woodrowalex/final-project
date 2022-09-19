@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styled from 'styled-components'
 
 
@@ -6,47 +7,57 @@ const Header = () => {
 
     return (
         <Wrapper>
-            <Logo>
-                <h1>Where's the Weather?</h1>
-            </Logo>
+            {/* <Title> */}
+                <Link to="/" 
+                style={{textDecoration: "none"}}>
+                    <h1>Where's the Weather?</h1>
+                </Link>
+            {/* </Title> */}
             <ButtonDiv>
-                <LoginButton>Log In</LoginButton>
-                <SignupButton>Sign Up</SignupButton>
+                <Link to="/login">
+                    <LoginButton>Log In</LoginButton>
+                </Link>
+                <Link to="/signup">
+                    <SignupButton>Sign Up</SignupButton>
+                </Link>
             </ButtonDiv>
-            {/* <Nav>
-                <>
-                {(!reservation)
-                ? <></>
-                : <StyledNavLink to='/reservation'>Reservation</StyledNavLink>
-                }
-                </>
-            </Nav> */}
         </Wrapper>
     );
 };
 
 const Wrapper = styled.header`
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     background-color: #efe9e1;
     height: 110px;
-`;
-const Logo = styled.div`    
+    border: 1px solid black;
 `;
 
+
 const ButtonDiv = styled.div`
-    position: absolute;
-    top: 10%;
-    right: 10%;
-    background-color: white;
+    display: flex;
+    justify-content: space-between;
 `
 
 const LoginButton = styled.button`
-
+    border-radius: 10px;
+    padding: 20px 50px;
+    margin: 15px 30px;
+    cursor: pointer;
 `
 
 const SignupButton = styled.button`
-
+    border-radius: 10px;
+    padding: 20px 50px;
+    margin: 15px 30px;
+    cursor: pointer;
 `
+
+// const Title = styled.div`
+//     h1 {
+//         text-decoration: none;
+//     }
+
+// `
 
 export default Header;

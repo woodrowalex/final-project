@@ -4,17 +4,21 @@ const HomeFeed = () => {
     return (
         <>
             <DivName>
-            Sign Up
+            Welcome                          
             </DivName>
             <DivName>
-            Sign In
+            Please log in or sign Up
             </DivName>
         </>
     )
 };
 
 const DivName = styled.div `
-font-family: Arial, Helvetica, sans-serif;
+/* display: flex;
+flex-direction: column; */
+justify-content: space-around;
+align-items: center;
+font-size: x-large;
 font-weight: bold;
 text-decoration: none;
 display: flex;
