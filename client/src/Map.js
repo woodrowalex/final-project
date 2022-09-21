@@ -7,79 +7,69 @@ import ThunderstormIcon from '@mui/icons-material/Thunderstorm';
 import { PinContext } from './PinContext';
 import { Link, useNavigate } from "react-router-dom";
 import { Room } from "@material-ui/icons";
-
-
-
-
+import axios from "axios";
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoid29vZHJvd2FsZXgiLCJhIjoiY2w4NWJqZ2doMGV6dTNvb2VjZnI5aGE1NCJ9.geOwh6qkCvAA21JV-H8buw'
 
-
 const Map = () => {
-    // const [pins, setPins] = useState([]);
+    const [currentUsername, setCurrentUsername] = useState(null); //should add userinfo from login
+    const [pins, setPins] = useState([]);
     const [showPopup, setShowPopup] = useState(true);
+    const [currentPlaceId, setCurrentPlaceId] = useState(null);
+    const [newPlace, setNewPlace] = useState(null);
+    const [category, setCategory] = useState(null);
+    const [desc, setDesc] = useState(null);
+
     const [viewState, setViewState] = useState({
     latitude: 45.508888,
     longitude: -73.561668,
     zoom: 8
     });
-    
-    const {
-    pins,
-    selectedPin,
-    setPins,
-    setSelectedPin,
-    setNewPlace
-    } = useContext(PinContext)
+     
+                const handleMarkerClick = (_id, lat, long) => {
+                    setCurrentPlaceId(_id);
+                    setViewState({ ...viewState, latitude: lat, longitude: long });
+                };
+                
+                const handleAddClick = (e) => {
+                    const [longitude, latitude] = e.lngLat;
+                    setNewPlace({
+                        lat: latitude,
+                        long: longitude,
+                    });
+                };
+                
+                const handleSubmit = async (e) => {
+                    e.preventDefault();
+                    const newPin = {
+                        username: currentUsername,
+                        category: category,
+                        description: desc
+                    };
+            
+                    try {
+                        const res = await axios.post("/pins", newPin);
+                        setPins([...pins, res.data]);
+                        setNewPlace(null);
+                    } catch (err) {
+                        console.log(err);
+                    }
+                };
 
-    // const navigate = useNavigate();
-
-    console.log(selectedPin);
-
-    const selectPinHandler = (e) => {
-        setSelectedPin(e.target.value) 
-    };
-    const map = ReactMapGL;
-
-    // map.on('click', addMarker);
-
-// const addMarker = (e) => {
-//   if (typeof circleMarker !== "undefined" ){ 
-//     map.removeLayer(circleMarker);
-//   }
-//   //add marker
-//   const circleMarker = new  circle(e.latlng, 200, {
-//                 color: 'red',
-//                 fillColor: '#f03',
-//                 fillOpacity: 0.5
-//             }).addTo(map);
-// }
+                useEffect(() => {
+                    const getPins = async () => {
+                        try {
+                            const allPins = await axios.get("/pins");
+                            setPins(allPins.data);
+                        } catch (err) {
+                            console.log(err);
+                        }
+                        };
+                        getPins();
+                    }, []);
 
 
-    useEffect(() => {
-    fetch("/api/get-pins")
-    .then((res) => res.json())
-    .then((data) => {
-        console.log(data)
-        setPins(data.data)
-    })
-    .catch((err) => console.log(err))
-    }, [])
-
-    const handleMarkerClick = (_id, lat, long) => {
-        // setCurrentPlaceId(id);
-        setViewState({ ...viewState, latitude: lat, longitude: long });
-      };
-
-      const handleAddClick = (e) => {
-        const [longitude, latitude] = e.lngLat;
-        setNewPlace({
-          lat: latitude,
-          long: longitude,
-        });
-      };
-
-return (
+                return (
     <ReactMapGL
         {...viewState}
         onMove={evt => setViewState(evt.viewState)}
@@ -88,9 +78,8 @@ return (
         mapboxAccessToken={MAPBOX_TOKEN}
     >
 
-        {pins
-        ?pins.map((p) => {
-        return (
+        {pins.map((p) => (
+            <>
             <Marker longitude={p.long} latitude={p.lat} 
                 color="red">
                     <Room
@@ -100,36 +89,41 @@ return (
                     cursor: "pointer",
                     }}
                 onClick={() => handleMarkerClick(p._id, p.lat, p.long)}
-              />
-                {/* onClick={() => handleMarkerClick(pins.map._id, pins.map.lat, pins.map.long)} */}
-            </Marker>)
-
-        })
-    :<></>}
+            />
+            </Marker>
         <Marker longitude={-73.561668} latitude={45.508888} 
             color="red">
-            {/* onClick={() => HandleSelectedPin(pins.map._id, pins.map.lat, pins.map.long)} */}
         </Marker>
         {showPopup && (
-        <Popup className='popup'
-            longitude={p.long} latitude={p.lat}
+            <Popup 
+            className='popup'
+            longitude={newPlace.long} 
+            latitude={newPlace.lat}
+            closeButton={true}
             anchor="left"
-            onClose={() => setShowPopup(true)}>
+            onClose={() => setNewPlace(null)}>
             <Div>
-                <Label>Weather category</Label>
-                <H4 className='category'> {p.category} </H4>
-                <Label>Date </Label>
-                <H4 className='date'>Sept 10th</H4>
-                <Label>Time </Label>
-                <H4 className='time'>4:54pm</H4>
-                <Label>Posted by:</Label>
-                <H4 className='user'>p.user</H4>
-                <Link to="/weather-description">
-                    <Button><div>Click here for</div> <div>more info</div></Button>
-                </Link>
+                <form onSubmit={handleSubmit}>
+                    <Label>Weather category</Label>
+                    <input 
+                        placeholder="Weather category"
+                        onChange={(e) => setCategory(e.target.value)}/>
+                    <Label>Description</Label>
+                    <input 
+                        placeholder="Weather description"
+                        onChange={(e) => setDesc(e.target.value)}/>
+                    {/* <Link to="/weather-description">
+                        <Button><div>Click here for</div> <div>more info</div></Button>
+                    </Link> */}
+                    <button type="submit" className="submitButton">
+                        Add Pin
+                    </button>
+                </form>
             </Div>
         </Popup>
         )};
+                </>
+            ))}
     </ReactMapGL>
 )};
 
@@ -440,3 +434,20 @@ export default Map;
 // `
 
 // export default Map;
+
+
+
+// map.on('click', addMarker);
+    
+    // const addMarker = (e) => {
+        //   if (typeof circleMarker !== "undefined" ){ 
+            //     map.removeLayer(circleMarker);
+            //   }
+            //   //add marker
+            //   const circleMarker = new  circle(e.latlng, 200, {
+                //                 color: 'red',
+                //                 fillColor: '#f03',
+                //                 fillOpacity: 0.5
+                //             }).addTo(map);
+                // }
+                

@@ -21,58 +21,7 @@ const MAPBOX_TOKEN = 'pk.eyJ1Ijoid29vZHJvd2FsZXgiLCJhIjoiY2w4NWJqZ2doMGV6dTNvb2V
 
 
 const App = () => {
-
-  const [showPopup, setShowPopup] = React.useState(true);
-  const [viewState, setViewState] = React.useState({
-    latitude: 45.508888,
-    longitude: -73.561668,
-    zoom: 8
-  });
   
-  // const {
-  //   pins,
-  //   setPins,
-  //   username,
-  //   setUsername,
-  //   category,
-  //   setCategory,
-  //   description,
-  //   setDescription,
-  //   lat,
-  //   setLat,
-  //   long, 
-  //   setLong,
-  //   selectedPin,
-  //   setSelectedPin
-  // } = useContext(PinContext)
-
-  // const navigate = useNavigate();
-  // // console.log(selectedPin);
-
-  // // const HandleSelectedPin = (e) => {
-  // //   setSelectedPin(e.target.value)
-  // // };
-
-
-  // useEffect(() => {
-  //   fetch("/api/get-pins", {
-  //   method: "GET",
-  //   body: JSON.stringify(newPin),
-  //   headers: {
-  //     Accept: "application/json",
-  //     "Content-Type": "application/json",
-  //   },
-  // })
-  //   .then((res) => res.json())
-  //   .then((data) => {
-  //     console.log(data)
-  //     setPins(data.data)
-  //   })
-  //   .catch((err) => console.log(err))
-  // }, [setPins])
-
-//   if (!pins) return <p>Loading...</p>;
-// console.log(pins)
   return (
     <> 
       <BrowserRouter>
@@ -95,13 +44,6 @@ const App = () => {
   );
 }
 
-// const Div = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   width: 150px;
-//   height: 250px;
-//   justify-content: space-around;
-// `
 
 const MainDiv = styled.div`
 display: flex;
