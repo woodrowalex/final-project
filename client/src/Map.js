@@ -6,7 +6,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import ThunderstormIcon from '@mui/icons-material/Thunderstorm';
 import { PinContext } from './PinContext';
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Room } from "@material-ui/icons";
+
 
 
 
@@ -27,7 +28,8 @@ const Map = () => {
     pins,
     selectedPin,
     setPins,
-    setSelectedPin
+    setSelectedPin,
+    setNewPlace
     } = useContext(PinContext)
 
     // const navigate = useNavigate();
@@ -37,22 +39,22 @@ const Map = () => {
     const selectPinHandler = (e) => {
         setSelectedPin(e.target.value) 
     };
+    const map = ReactMapGL;
 
-    // const HandleSelectedPin = (e) => {
-    //   setSelectedPin(e.target.value)
-    // };
+    // map.on('click', addMarker);
 
-    // useEffect(() => {
-    //     const getPins = async () => {
-    //         try {
-    //             const allPins = await axios.get("/get-pins");
-    //             setPins(res.data);
-    //         } catch (err) {
-    //             console.log(err);
-    //         }
-    //     };
-    //     getPins();
-    // }, []);
+// const addMarker = (e) => {
+//   if (typeof circleMarker !== "undefined" ){ 
+//     map.removeLayer(circleMarker);
+//   }
+//   //add marker
+//   const circleMarker = new  circle(e.latlng, 200, {
+//                 color: 'red',
+//                 fillColor: '#f03',
+//                 fillOpacity: 0.5
+//             }).addTo(map);
+// }
+
 
     useEffect(() => {
     fetch("/api/get-pins")
@@ -64,9 +66,17 @@ const Map = () => {
     .catch((err) => console.log(err))
     }, [])
 
-    const handleMarkerClick = (id, lat, long) => {
+    const handleMarkerClick = (_id, lat, long) => {
         // setCurrentPlaceId(id);
         setViewState({ ...viewState, latitude: lat, longitude: long });
+      };
+
+      const handleAddClick = (e) => {
+        const [longitude, latitude] = e.lngLat;
+        setNewPlace({
+          lat: latitude,
+          long: longitude,
+        });
       };
 
 return (
@@ -77,12 +87,21 @@ return (
         mapStyle="mapbox://styles/mapbox/streets-v9"
         mapboxAccessToken={MAPBOX_TOKEN}
     >
+
         {pins
-        ?pins.map((pin) => {
+        ?pins.map((p) => {
         return (
-            <Marker longitude={pin.long} latitude={pin.lat} 
+            <Marker longitude={p.long} latitude={p.lat} 
                 color="red">
-                onClick={() => handleMarkerClick(pins.map._id, pins.map.lat, pins.map.long)}
+                    <Room
+                    style={{
+                    fontSize: 7 * viewState.zoom,
+                    color: "tomato",
+                    cursor: "pointer",
+                    }}
+                onClick={() => handleMarkerClick(p._id, p.lat, p.long)}
+              />
+                {/* onClick={() => handleMarkerClick(pins.map._id, pins.map.lat, pins.map.long)} */}
             </Marker>)
 
         })
@@ -93,18 +112,18 @@ return (
         </Marker>
         {showPopup && (
         <Popup className='popup'
-            longitude={-73.561668} latitude={45.508888}
+            longitude={p.long} latitude={p.lat}
             anchor="left"
             onClose={() => setShowPopup(true)}>
             <Div>
                 <Label>Weather category</Label>
-                <H4 className='category'> Thunderstorm </H4>
+                <H4 className='category'> {p.category} </H4>
                 <Label>Date </Label>
                 <H4 className='date'>Sept 10th</H4>
                 <Label>Time </Label>
                 <H4 className='time'>4:54pm</H4>
                 <Label>Posted by:</Label>
-                <H4 className='user'>Woodrow</H4>
+                <H4 className='user'>p.user</H4>
                 <Link to="/weather-description">
                     <Button><div>Click here for</div> <div>more info</div></Button>
                 </Link>
