@@ -1,8 +1,19 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components'
+import { PinContext } from "./PinContext";
+import { useContext, useState } from "react";
+
+
 
 
 const Header = () => {
+     const {
+        setCurrentUser,
+        isLoggedIn,
+        setIsLoggedIn
+    } = useContext(PinContext);
+
+    // let isLoggedIn === true;
     // const reservation = sessionStorage.getItem("reservation");
 
     return (
@@ -14,12 +25,28 @@ const Header = () => {
                 </Link>
             {/* </Title> */}
             <ButtonDiv>
+            {isLoggedIn === false 
+            ? <> 
                 <Link to="/login">
                     <LoginButton>Log In</LoginButton>
                 </Link>
+                </>
+                : <>
+                <Link to="/loggedout">
+                    <>
+                    <Link to="/login">
+                        <SignupButton type="button" onClick={(e) => {
+                        e.preventDefault() 
+                        setIsLoggedIn(false)} }>Log Out</SignupButton>
+                        </Link>
+                    </>
+                </Link>
+                </>
+            }
                 <Link to="/signup">
                     <SignupButton>Sign Up</SignupButton>
                 </Link>
+            
             </ButtonDiv>
         </Wrapper>
     );
@@ -52,6 +79,8 @@ const SignupButton = styled.button`
     margin: 15px 30px;
     cursor: pointer;
 `
+
+
 
 // const Title = styled.div`
 //     h1 {

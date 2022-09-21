@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import ReactMapGL, {Marker, Popup} from 'react-map-gl';
 import styled from 'styled-components'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import ThunderstormIcon from '@mui/icons-material/Thunderstorm';
 import { PinContext } from './PinContext';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
 
 
 
@@ -13,8 +15,9 @@ const MAPBOX_TOKEN = 'pk.eyJ1Ijoid29vZHJvd2FsZXgiLCJhIjoiY2w4NWJqZ2doMGV6dTNvb2V
 
 
 const Map = () => {
-    const [showPopup, setShowPopup] = React.useState(true);
-    const [viewState, setViewState] = React.useState({
+    // const [pins, setPins] = useState([]);
+    const [showPopup, setShowPopup] = useState(true);
+    const [viewState, setViewState] = useState({
     latitude: 45.508888,
     longitude: -73.561668,
     zoom: 8
@@ -22,16 +25,34 @@ const Map = () => {
     
     const {
     pins,
-    // selectedPin,
+    selectedPin,
     setPins,
-    // setSelectedPin
+    setSelectedPin
     } = useContext(PinContext)
 
-    // console.log(selectedPin);
+    // const navigate = useNavigate();
+
+    console.log(selectedPin);
+
+    const selectPinHandler = (e) => {
+        setSelectedPin(e.target.value) 
+    };
 
     // const HandleSelectedPin = (e) => {
     //   setSelectedPin(e.target.value)
     // };
+
+    // useEffect(() => {
+    //     const getPins = async () => {
+    //         try {
+    //             const allPins = await axios.get("/get-pins");
+    //             setPins(res.data);
+    //         } catch (err) {
+    //             console.log(err);
+    //         }
+    //     };
+    //     getPins();
+    // }, []);
 
     useEffect(() => {
     fetch("/api/get-pins")
@@ -41,8 +62,12 @@ const Map = () => {
         setPins(data.data)
     })
     .catch((err) => console.log(err))
-    }, [setPins])
+    }, [])
 
+    const handleMarkerClick = (id, lat, long) => {
+        // setCurrentPlaceId(id);
+        setViewState({ ...viewState, latitude: lat, longitude: long });
+      };
 
 return (
     <ReactMapGL
@@ -57,7 +82,7 @@ return (
         return (
             <Marker longitude={pin.long} latitude={pin.lat} 
                 color="red">
-                {/* onClick={() => HandleSelectedPin(pins.map._id, pins.map.lat, pins.map.long)} */}
+                onClick={() => handleMarkerClick(pins.map._id, pins.map.lat, pins.map.long)}
             </Marker>)
 
         })
@@ -73,7 +98,7 @@ return (
             onClose={() => setShowPopup(true)}>
             <Div>
                 <Label>Weather category</Label>
-                <H4 className='category'> Thunderstorm <ThunderstormIcon styles={{ fontSize: 'small' }}/></H4>
+                <H4 className='category'> Thunderstorm </H4>
                 <Label>Date </Label>
                 <H4 className='date'>Sept 10th</H4>
                 <Label>Time </Label>

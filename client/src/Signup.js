@@ -2,49 +2,60 @@ import styled from "styled-components";
 
 import { useContext, useState } from "react";
 import { PinContext } from "./PinContext";
+import { useNavigate } from "react-router-dom";
+
 
 const Signup = () => {
     const {
-        setCurrentUser,
+        username,
+        setUsername,
+        email,
+        setEmail,
+        password,
+        setPassword,
         isLoggedIn,
         setIsLoggedIn
+
     } = useContext(PinContext);
 
-    const [userFirstName, setUserFirstName] = useState("");
-    const [userEmail, setUserEmail] = useState("");
-    const [passwordInput, setPasswordInput] = useState("");
+    const navigate = useNavigate();
+
+
+    // const [userFirstName, setUserFirstName] = useState("");
+    // const [userEmail, setUserEmail] = useState("");
+    // const [passwordInput, setPasswordInput] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
     
     const newUser = {
-        username: userFirstName,
-        email: userEmail,
-        password: passwordInput,
+        username,
+        email,
+        password
     };
 
-    const options = {
+
+    fetch("/api/add-user", {
         method: "POST",
         body: JSON.stringify(newUser),
-        headers: { 
+        headers: {
             Accept: "application/json",
-            "Content-Type": "application/json" 
+            "Content-Type": "application/json",
         },
-    };
-
-    console.log(newUser);
-
-        fetch("/api/add-user", options)
-            .then((res) => res.json())
-            .then((json) => {
-                const {status, error} = json;
-
-                if (status >= 400) {
-                    console.log("400-error")
-                } else if (status === 200) {
-                    console.log("Sign Up Successful")
-                }
-            })
+    })
+        .then((res) => res.json())
+        .then((data) => {
+            console.log(data)
+            if (data.status == 200) {
+                sessionStorage.setItem("user", JSON.stringify(data.data));
+                setIsLoggedIn(true);
+                navigate("/signedin");
+            } else if (data.status == 404) {
+                window.alert("This user already exists");
+            } else {
+                window.alert("Error - try again");
+            }
+        })
             .catch((err) => console.log(err))
     };
     
@@ -66,30 +77,27 @@ const Signup = () => {
                     type="text"
                     name="username"
                     placeholder="Username"
-                    value={userFirstName}
                     required={true}
                     onChange={(e) => {
-                        setUserFirstName(e.target.value);
+                        setUsername(e.target.value);
                     }}
                 />
                 <input
                     type="email"
                     name="email"
                     placeholder="Email"
-                    value={userEmail}
                     required={true}
                     onChange={(e) => {
-                        setUserEmail(e.target.value);
+                        setEmail(e.target.value);
                     }}
                 />
                     <input
                         type="password"
                         name="password"
                         placeholder="Password"
-                        value={passwordInput}
                         required = {true}
                         onChange={(e) => {
-                            setPasswordInput(e.target.value);
+                            setPassword(e.target.value);
                         }}
                     />
                     <Button type="submit">Submit</Button>
@@ -116,15 +124,18 @@ const FormBody = styled.div`
 `;
 
 const Button = styled.button`
-    background-color: var(--color-alabama-crimson);
-    border: 0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: black;
+    background-color: #efe9e1;
+    width: 100px;
+    height: 40px;
+    border: none;
+    margin: 20px 20px;
     &:hover {
+        font-weight: bold;
+        border: 1px solid black;
         cursor: pointer;
-    }
-    &:disabled {
-        color: var(--color-orange);
-        background-color: #d1560e;
-        border: 0;
     }
 `;
 

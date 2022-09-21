@@ -3,10 +3,13 @@ import styled from "styled-components";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PinContext } from "./PinContext";
+import SignedIn from "./SignedIn";
+import ThunderstormIcon from '@mui/icons-material/Thunderstorm';
+
 
 const Login = () => {
     const {
-        setCurrentUset,
+        setCurrentUser,
         isLoggedIn,
         setIsLoggedIn
     } = useContext(PinContext);
@@ -16,11 +19,12 @@ const Login = () => {
     const [usernameInput, setUsernameInput] = useState();
     const [emailInput, setEmailInput] = useState();
     const [passwordInput, setPasswordInput]= useState();
-    const [inputType, setInputType] = useState();
     
-    const handleSubmit = (e) => {
+    
+    const handleSubmit = async (e) => {
         e.preventDefault();
-    
+        console.log("handleSubmit")
+        
         const loggingIn = {
             email: emailInput,
             password: passwordInput
@@ -34,24 +38,27 @@ const Login = () => {
                 "Content-Type": "application/json",
             },
         };
-
+        
         fetch("/api/login", options) 
             .then((res) => res.json())
             .then((data) => {
-                if (data.status === 200) {
-                    // sessionStorage.setItem("user", JSON.stringify(data));
-                    isLoggedIn = true;
-                    navigate.push("/confirmed");
-                } else {
-                    window.alert("Error - try again");
-                }
+                // if (data.status === 200) {
+                    setIsLoggedIn(true);
+                    // setCurrentUser(data.data);
+                    // navigate("/signedin");
+                // } else {
+                //     window.alert("Error - try again");
+                // }
             });
     };
+
+    console.log(isLoggedIn)
     
     return (
         <FormWrapper>
-            <form onSubmit={handleSubmit}>
-                <FormBody>
+            {isLoggedIn === false 
+            ? <>    
+                <FormBody onSubmit={handleSubmit}>
                     LOG IN BELOW
                 <input
                     type="text"
@@ -72,16 +79,39 @@ const Login = () => {
                     }}
                 />
                     <input
-                        type={inputType}
+                        type="password"
                         name="password"
                         placeholder="Password"
+                        value={passwordInput}
                         onChange={(e) => {
                             setPasswordInput(e.target.value);
                         }}
                     />
-                    <Button type="submit">Log In</Button>
+                    <Button 
+                    type="submit"
+                    >Log In</Button>
+                    
                 </FormBody>
-            </form>
+            </>
+            : <>
+            <Div>
+                Sweeeeeet, you logged in!
+            </Div>
+            <Div>
+            Now go out there and find some cool weather events to share!!
+            </Div>
+            <Div>
+            <ThunderstormIcon/>
+            </Div>
+            <Div>
+            <ThunderstormIcon/>
+            </Div>
+            <Button type="button" onClick={(e) => {
+                e.preventDefault() 
+                setIsLoggedIn(false)} }>Log Out</Button>
+            </>
+            }
+
         </FormWrapper>
     );
 };
@@ -101,15 +131,33 @@ const FormBody = styled.form`
 `;
 
 const Button = styled.button`
-    background-color: var(--color-alabama-crimson);
-    border: 0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: black;
+    background-color: #efe9e1;
+    width: 100px;
+    height: 40px;
+    border: none;
+    margin: 20px 20px;
     &:hover {
+        font-weight: bold;
+        border: 1px solid black;
         cursor: pointer;
     }
-    &:disabled {
-        color: var(--color-orange);
-        background-color: #d1560e;
-        border: 0;
-    }`
+`;
+
+const Div = styled.div `
+/* display: flex;
+flex-direction: column; */
+justify-content: space-around;
+align-items: center;
+font-size: x-large;
+font-weight: bold;
+text-decoration: none;
+display: flex;
+flex-direction: row;
+border: 20px;
+margin-top: 20px;
+`;
 
 export default Login;

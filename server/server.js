@@ -28,7 +28,7 @@ express()
     // ---------------------------------
     .post("/api/add-user", addUser) //working
     .post("/api/add-pin", addPin) //working
-    .get("/api/get-pins", getPins) 
+    .get("/api/get-pins", getPins)   
     .post("/api/login", login) //working
 
     .patch("/api/update-pin/:pin", updatePin)
